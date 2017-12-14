@@ -1,0 +1,10 @@
+.idea
+node_modules
+
+.DS_Store
+.env
+env.yml
+package-lock.json
+npm-debug.log
+npm-debug.log*
+report-karma.xml

@@ -1,0 +1,22 @@
+{
+  "name": "uklon-api",
+  "version": "0.1.0",
+  "description": "uklon-api",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "mocha tests/**/*.js"
+  },
+  "author": "0xfbfe",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^3.5.0"
+  },
+  "dependencies": {
+    "lodash.merge": "^4.6.0",
+    "request": "^2.81.0",
+    "request-promise-native": "^1.0.4"
+  }
+}
