@@ -84,133 +84,165 @@ class Uklon {
     this.lang = lang;
     this.name = name;
     this.city = CITIES[city];
+    this.phone = phone;
 
-    this.form = {...DEFAULT_FORM, ClientName: name, Phone: phone, CityId: this.city};
+    this.form = {...DEFAULT_FORM, ClientName: this.name, Phone: this.phone, CityId: this.city};
   }
 
   /**
    * @description Get addresses.
    * @method GET
-   * @url http://uklon.com.ua/api/v1/addresses?q=raket&limit=5&timestamp=2162513
+   * @url https://www.uklon.com.ua/api/v1/addresses?q=raket&limit=5&timestamp=2162513
    * @param {String} address
    * @param {Number} limit
    * @param {Number} timestamp
    * @return {Promise}
    */
   fetchAddress(address, limit = 5, timestamp = Date.now()) {
-    let qs = queryString.stringify({q: address, limit, timestamp});
-    let options = this._getOptions(`${URLS.addresses}?${qs}`, 'GET');
+    const qs = queryString.stringify({q: address, limit, timestamp});
+    const options = this._getOptions(`${URLS.addresses}?${qs}`, 'GET');
+
     return this._makeRequest(options);
   }
 
   /**
    * @description Get server time.
    * @method GET
-   * @url http://uklon.com.ua/api/time
+   * @url https://www.uklon.com.ua/api/time
    * @return {Promise}
    */
   fetchServerTime() {
-    let options = this._getOptions(URLS.time);
+    const options = this._getOptions(URLS.time);
+
     return this._makeRequest(options);
   }
 
   /**
    * @description Get cost of the order.
    * @method POST
-   * @url http://uklon.com.ua/api/v1/orders/cost
+   * @url https://www.uklon.com.ua/api/v1/orders/cost
    * @param {FormObj} form
    * @return {Promise}
    */
   fetchCost(form = {}) {
-    let options = this._getOptions(URLS.cost, 'POST', this._getFormDataRequestOptions({...this.form, ...form}));
+    const options = this._getOptions(URLS.cost, 'POST', this._getFormDataRequestOptions({...this.form, ...form}));
+
     return this._makeRequest(options);
   }
 
   /**
    * @description Create order.
    * @method POST
-   * @url http://uklon.com.ua/api/v1/orders/
+   * @url https://www.uklon.com.ua/api/v1/orders/
    * @param {FormObj} form
    * @return {Promise}
    */
   createOrder(form = {}) {
-    let options = this._getOptions(URLS.orders, 'POST', this._getFormDataRequestOptions({...this.form, ...form}));
+    const options = this._getOptions(URLS.orders, 'POST', this._getFormDataRequestOptions({...this.form, ...form}));
+
     return this._makeRequest(options);
   }
 
   /**
    * @description Get order info
    * @method GET
-   * @url http://uklon.com.ua/api/v1/orders/:order_id
+   * @url https://www.uklon.com.ua/api/v1/orders/:order_id
    * @param {String} orderUid
    * @return {Promise}
    */
   fetchOrder(orderUid) {
-    let options = this._getOptions(`${URLS.orders}/${orderUid}`);
+    const options = this._getOptions(`${URLS.orders}/${orderUid}`);
+
     return this._makeRequest(options);
   }
 
   /**
    * @description Get the Driver Location.
    * @method GET
-   * @url http://uklon.com.ua/api/v1/orders/:order_id/driverLocation
+   * @url https://www.uklon.com.ua/api/v1/orders/:order_id/driverLocation
    * @param {String} orderUid
    * @return {Promise}
    */
   fetchDriverLocation(orderUid) {
-    let options = this._getOptions(`${URLS.orders}/${orderUid}/driverLocation`);
+    const options = this._getOptions(`${URLS.orders}/${orderUid}/driverLocation`);
+
     return this._makeRequest(options);
   }
 
   /**
    * @description Get traffic.
    * @method GET
-   * @url http://uklon.com.ua/api/v1/orders/:order_id/traffic
+   * @url https://www.uklon.com.ua/api/v1/orders/:order_id/traffic
    * @param {String} orderUid
    * @return {Promise}
    */
   fetchTraffic(orderUid) {
-    let options = this._getOptions(`${URLS.orders}/${orderUid}/traffic`);
+    const options = this._getOptions(`${URLS.orders}/${orderUid}/traffic`);
     return this._makeRequest(options);
   }
 
   /**
    * @description Recreate the order.
    * @method POST
-   * @url http://uklon.com.ua/api/v1/orders/:order_id/recreate
+   * @url https://www.uklon.com.ua/api/v1/orders/:order_id/recreate
    * @request_payload {extra_cost: <Number>}
    * @param {String} orderUid
    * @param {Number} [extra_cost]
    * @return {Promise}
    */
   recreateOrder(orderUid, extra_cost = 0) {
-    let options = this._getOptions(`${URLS.orders}/${orderUid}/recreate`, 'POST', {body: {extra_cost}});
+    const options = this._getOptions(`${URLS.orders}/${orderUid}/recreate`, 'POST', {body: {extra_cost}});
+
     return this._makeRequest(options);
   }
 
   /**
    * @description Cancel the order.
    * @method PUT
-   * @url http://uklon.com.ua/api/v1/orders/:order_id/cancel
+   * @url https://www.uklon.com.ua/api/v1/orders/:order_id/cancel
    * @request_payload {client_cancel_reason: "timeout", cancel_comment: ""}
    * @param {String} orderUid
    * @param {String} [cancel_comment]
    * @param {String} [client_cancel_reason]
    * @return {Promise}
    */
-  destroyOrder(orderUid, cancel_comment = '', client_cancel_reason = 'timeout') {
-    let options = this._getOptions(`${URLS.orders}/${orderUid}/cancel`, 'PUT', {
-      body: {
+  destroyOrder(orderUid, cancel_comment = '', client_cancel_reason = 'client') {
+    const options = this._getOptions(`${URLS.orders}/${orderUid}/cancel`, 'PUT', {
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify({
         cancel_comment,
         client_cancel_reason
-      }
+      })
     });
 
     return this._makeRequest(options);
   }
 
-  phoneVerification() {
+  /**
+   * @description Verify the phone number.
+   * @method POST
+   * @url https://www.uklon.com.ua/api/v1/phone/verification
+   * @param {String} [phone]
+   * @return {Promise}
+   */
+  verifyPhone(phone = this.phone) {
+    const options = this._getOptions(URLS.verification, 'POST', this._getFormDataRequestOptions({phone}));
 
+    return this._makeRequest(options);
+  }
+
+  /**
+   * @description Confirm the verification code.
+   * @method GET
+   * @url https://www.uklon.com.ua/?ConfirmCode=:code
+   * @param {String} code
+   * @param {String} [phone]
+   * @return {Promise}
+   */
+  confirmCode(code, phone = this.phone) {
+    const options = this._getOptions(URLS.confirmCode, 'POST', this._getFormDataRequestOptions({phone, code}));
+
+    return this._makeRequest(options);
   }
 
   /**
@@ -249,6 +281,7 @@ class Uklon {
         }
       }
     }
+
     return fd;
   };
 
@@ -264,7 +297,7 @@ class Uklon {
       headers: {Cookie: `CultureUklon=${this.lang}; City=${this.city};`, client_id: this.clientId},
     };
 
-    return _merge({url, method, ...optionsInit, ...options});
+    return _merge({url, method, ..._merge(optionsInit, options)});
   }
 
   /**
@@ -273,7 +306,6 @@ class Uklon {
    * @return {Promise}
    */
   _makeRequest(options) {
-    console.log(options, "OPTIONS!");
     return request(options);
   }
 }

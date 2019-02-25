@@ -241,7 +241,7 @@ const REQUESTS = {
       headers: {...DEFAULT_HEADERS},
       body: {cancel_comment: '', client_cancel_reason: 'timeout'}
     }
-  }
+  },
 };
 
 const REQUEST_NAMES = Object.keys(REQUESTS);

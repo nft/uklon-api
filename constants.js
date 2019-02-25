@@ -1,11 +1,12 @@
 'use strict';
 
 const URLS = {
-  addresses: 'http://www.uklon.com.ua/api/v1/addresses',  // GET
-  cost: 'https://www.uklon.com.ua/api/v1/orders/cost',    // POST
-  time: 'http://www.uklon.com.ua/api/time',               // GET
-  orders: 'http://www.uklon.com.ua/api/v1/orders',         // GET|POST|PUT,
-  verification: 'https://www.uklon.com.ua/api/v1/phone/verification', // POST
+  addresses: 'https://www.uklon.com.ua/api/v1/addresses',                   // GET
+  cost: 'https://www.uklon.com.ua/api/v1/orders/cost',                      // POST
+  time: 'https://www.uklon.com.ua/api/time',                                // GET
+  orders: 'https://www.uklon.com.ua/api/v1/orders',                         // GET|POST|PUT,
+  verification: 'https://www.uklon.com.ua/api/v1/phone/verification',       // POST
+  confirmCode: 'https://www.uklon.com.ua/api/v1/phone/verification/approve' // POST
 };
 
 const CITIES = {

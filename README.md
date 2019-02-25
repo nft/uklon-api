@@ -187,6 +187,20 @@ uklon.fetchTraffic('orderUID')
 }
 ```
 
+#### Verify phone number
+
+*It won't create the order if your number is not verified*
+
+```javascript
+uklon.verifyPhone()
+```
+
+#### Confirm the code
+
+```javascript
+uklon.confirmCode(216212)
+```
+
 ### Cities
   - Kiev
   - Odessa
