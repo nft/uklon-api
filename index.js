@@ -80,6 +80,10 @@ class Uklon {
       throw new Error('City not found.');
     }
 
+    if (phone && phone.startsWith('+')) {
+      throw new Error('Wrong phone format.');
+    }
+
     this.clientId = clientId;
     this.lang = lang;
     this.name = name;
@@ -187,11 +191,14 @@ class Uklon {
    * @url https://www.uklon.com.ua/api/v1/orders/:order_id/recreate
    * @request_payload {extra_cost: <Number>}
    * @param {String} orderUid
-   * @param {Number} [extra_cost]
+   * @param {Number} [extra_cost = 0]
    * @return {Promise}
    */
   recreateOrder(orderUid, extra_cost = 0) {
-    const options = this._getOptions(`${URLS.orders}/${orderUid}/recreate`, 'POST', {body: {extra_cost}});
+    const options = this._getOptions(`${URLS.orders}/${orderUid}/recreate`, 'POST', {
+      headers: {'content-type': 'application/json'},
+      body: JSON.stringify({extra_cost})
+    });
 
     return this._makeRequest(options);
   }
@@ -202,8 +209,8 @@ class Uklon {
    * @url https://www.uklon.com.ua/api/v1/orders/:order_id/cancel
    * @request_payload {client_cancel_reason: "timeout", cancel_comment: ""}
    * @param {String} orderUid
-   * @param {String} [cancel_comment]
-   * @param {String} [client_cancel_reason]
+   * @param {String} [cancel_comment = '']
+   * @param {String} [client_cancel_reason = 'client']
    * @return {Promise}
    */
   destroyOrder(orderUid, cancel_comment = '', client_cancel_reason = 'client') {
@@ -222,7 +229,7 @@ class Uklon {
    * @description Verify the phone number.
    * @method POST
    * @url https://www.uklon.com.ua/api/v1/phone/verification
-   * @param {String} [phone]
+   * @param {String} [phone = this.phone]
    * @return {Promise}
    */
   verifyPhone(phone = this.phone) {
@@ -233,10 +240,10 @@ class Uklon {
 
   /**
    * @description Confirm the verification code.
-   * @method GET
-   * @url https://www.uklon.com.ua/?ConfirmCode=:code
+   * @method POST
+   * @url https://www.uklon.com.ua/api/v1/phone/verification/approve
    * @param {String} code
-   * @param {String} [phone]
+   * @param {String} [phone = this.phone]
    * @return {Promise}
    */
   confirmCode(code, phone = this.phone) {

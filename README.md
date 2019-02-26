@@ -6,19 +6,18 @@ The API is not official. Reverse-engineering, so be careful.
 
 ```javascript
 const Uklon = require('uklon-api');
-let uklon = new Uklon({
-  client_id: '6289de851fc726f887af8d5d7a56c635', 
+
+const uklon = new Uklon({
+  clientId: '6289de851fc726f887af8d5d7a56c635', 
   city: 'Kiev',
   name: 'Name',
-  phone: '123451',
-  lang: 'en'
+  phone: '380', // format 380xxxxxxx
+  lang: 'en' // lang of response and requests
 });
-```
 
-```javascript
 uklon.fetchAddress('raket')
-    .then(data => console.log(data)) // [{"address_name":"Raketna street","is_place":false}]
-    .catch(e => console.log(e));
+    .then(console.log) // [{"address_name":"Raketna street","is_place":false}]
+    .catch(e => console.log('Something went wrong', e));
 ```
 
 ### Methods
@@ -32,7 +31,7 @@ uklon.fetchAddress('Sikor');
 [
     {
         "address_name": "Sikorskoho street",
-        "is_place": false
+        "is_place": false // Means name of organization or smth, like supermarket name
     }
 ]
 ```
@@ -40,14 +39,6 @@ uklon.fetchAddress('Sikor');
 
 ```javascript
 uklon.fetchCost({
-  CityId: 0,
-  IsRouteUndefined: 'false',
-  TimeType: 'now',
-  CarType: 'Standart',
-  PaymentType: 'Cash',
-  PaymentInfo: 'Наличными',
-  RememberUser: 'false',
-  ExtraCost: '0',
   route: {
     entrance: '1',
     routePoints: [
@@ -75,17 +66,16 @@ uklon.fetchCost({
 ### Create order
 
 ```javascript
-const form = {
+
+uklon.createOrder({
   route: {
-     entrance: '1',
-     routePoints: [
-         {addressName: "Сикорского улица", houseNumber: '1'}, 
-         {addressName: "Ракетная улица", houseNumber: '1'}
+    entrance: '1',
+    routePoints: [
+      {addressName: "Сикорского улица", houseNumber: '1'}, 
+      {addressName: "Ракетная улица", houseNumber: '1'}
      ]
   }
-};
-
-uklon.createOrder(form)
+});
 
 // Response 
 {
@@ -109,7 +99,7 @@ uklon.createOrder(form)
 #### Get order info
 
 ```javascript
-uklon.fetchOrder('orderUID')
+uklon.fetchOrder('orderUID');
 
 // Response
 {
@@ -147,13 +137,13 @@ uklon.fetchOrder('orderUID')
 #### Recreate order
 
 ```javascript
-uklon.recreateOrder('orderUID', extra_cost = 0)
+uklon.recreateOrder('orderUID', extra_cost = 0);
 ```
 
 #### Cancel order
 
 ```javascript
-uklon.destroyOrder('orderUID', 'cancel_comment', client_cancel_reason = 'timeout')
+uklon.destroyOrder('orderUID', 'cancel_comment', client_cancel_reason = 'timeout');
 
 // Response 
 {
@@ -165,7 +155,7 @@ uklon.destroyOrder('orderUID', 'cancel_comment', client_cancel_reason = 'timeout
 #### Get driver location
 
 ```javascript
-uklon.fetchDriverLocation('orderUID')
+uklon.fetchDriverLocation('orderUID');
 
 // Response
 {
@@ -177,7 +167,7 @@ uklon.fetchDriverLocation('orderUID')
 #### Get traffic info
 
 ```javascript
-uklon.fetchTraffic('orderUID')
+uklon.fetchTraffic('orderUID');
 
 // Response
 {
@@ -192,13 +182,13 @@ uklon.fetchTraffic('orderUID')
 *It won't create the order if your number is not verified*
 
 ```javascript
-uklon.verifyPhone()
+uklon.verifyPhone();
 ```
 
 #### Confirm the code
 
 ```javascript
-uklon.confirmCode(216212)
+uklon.confirmCode(216212);
 ```
 
 ### Cities

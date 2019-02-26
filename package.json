@@ -1,7 +1,7 @@
 {
   "name": "uklon-api",
-  "version": "0.2.0",
-  "description": "Uklon NodeJS api",
+  "version": "0.2.1",
+  "description": "Uklon NodeJS API",
   "main": "index.js",
   "directories": {
     "test": "tests"
@@ -9,8 +9,20 @@
   "scripts": {
     "test": "mocha tests/**/*.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nft/uklon-api.git"
+  },
+  "keywords": [
+    "uklon api",
+    "uklone api nodejs"
+  ],
   "author": "Igor Vishnevsky",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nft/uklon-api/issues"
+  },
+  "homepage": "https://github.com/nft/uklon-api",
   "devDependencies": {
     "mocha": "^3.5.0"
   },

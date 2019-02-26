@@ -7,7 +7,12 @@ const {URLS} = require('../constants');
 Uklon.prototype._makeRequest = function (options) {
   return options;
 };
-const uklon = new Uklon({clientId: 'client-id', name: 'Name', phone: '0123'});
+
+const clientId  = 'cliend-id';
+const name = 'Name';
+const phone = '380';
+
+const uklon = new Uklon({clientId, name, phone});
 
 const FETCH_COST_FORM_PROPS = [
   'form.CityId',
@@ -27,23 +32,28 @@ const FETCH_COST_FORM_PROPS = [
   'form.RememberUser'
 ];
 const DEFAULT_FORM_HEADERS = {
-  client_id: 'client-id',
+  client_id: clientId,
   "Cookie": "CultureUklon=en; City=1;"
 };
 const DEFAULT_HEADERS = {
-  client_id: 'client-id',
+  client_id: clientId,
   "Cookie": "CultureUklon=en; City=1;"
 };
 
 /*  Regular Steps for creating order
- 1. /addresses?q=qs          GET
- 2. /cost                    POST
- 3. /time                    GET
- 4. /orders                  POST
- 5. /orders/:uid             GET
- 6. /orders/:uid/traffic     GET
- To cancel step
- 7. /orders/:uid/cancel      PUT
+ 1. /addresses?q=qs                   GET
+ 2. /cost                             POST
+ 3. /time                             GET
+ 4. /orders                           POST
+ 5. /orders/:uid                      GET
+ 6. /orders/:uid/traffic              GET
+
+ To cancel order
+ 7. /orders/:uid/cancel               PUT
+
+ If you get an error, like phone number is incorrect
+ 8. /phone/verification               POST
+ 9. /phone/verification/approve       POST
  */
 
 // I did an extra field "response", just to make things clearer.
@@ -61,14 +71,15 @@ const REQUESTS = {
 // Fetch Address GET
   FETCH_ADDRESS: {
     name: 'fetchAddress',
-    args: ['Oct', 5, 2723671],
+    args: ['sikor', 5, 2723671],
     response: [
-      {"address_name": "Octy street", "is_place": false},
-      {"address_name": "Pravoberezhna street", "is_place": false},
-      {"address_name": "Pravyka street (Hostomel)", "is_place": false}
+      {"address_name":"Sikorskoho street","is_place":false},
+      {"address_name":"Supermarket Bdzhilka (Sikorskoho street, 1A)","is_place":true},
+      {"address_name":"Business Center Flora Park (Sikorskoho street, 8)","is_place":true},
+      {"address_name":"Embassy of the United States of America in Ukraine (Sikorskoho street, 4)","is_place":true}
     ],
     compare: {
-      url: `${URLS.addresses}?q=Oct&limit=5&timestamp=2723671`,
+      url: `${URLS.addresses}?q=sikor&limit=5&timestamp=2723671`,
       method: 'GET',
       headers: {...DEFAULT_HEADERS}
     }
@@ -93,10 +104,10 @@ const REQUESTS = {
       "route": {
         "comment": "",
         "entrance": "1",
-        "routePoints": [{"addressName": "Владимирская улица", "houseNumber": "78"}, {
-          "addressName": "Окты улица",
-          "houseNumber": "33"
-        }]
+        "routePoints": [
+          {"addressName": "Sikorskoho street", "houseNumber": "78"},
+          {"addressName": "Vladislava Zaremby lane", "houseNumber": "33"}
+        ]
       }
     }],
     compare: {
@@ -105,8 +116,8 @@ const REQUESTS = {
       headers: {...DEFAULT_FORM_HEADERS},
       form: {
         CityId: 1,
-        ClientName: 'Name',
-        Phone: '0123',
+        ClientName: name,
+        Phone: phone,
         IsRouteUndefined: 'false',
         TimeType: 'now',
         CarType: 'Standart',
@@ -116,9 +127,9 @@ const REQUESTS = {
         ExtraCost: '0',
         'route.comment': '',
         'route.entrance': '1',
-        'route.routePoints[0].addressName': 'Владимирская улица',
+        'route.routePoints[0].addressName': 'Sikorskoho street',
         'route.routePoints[0].houseNumber': '78',
-        'route.routePoints[1].addressName': 'Окты улица',
+        'route.routePoints[1].addressName': 'Vladislava Zaremby lane',
         'route.routePoints[1].houseNumber': '33'
       }
     }
@@ -129,13 +140,12 @@ const REQUESTS = {
     validator: ['url', 'headers.method', 'headers.client_id', ...FETCH_COST_FORM_PROPS, 'form.ExtraCost'],
     args: [{
       comment: '',
-      Phone: '33555',
+      Phone: phone,
       entrance: '1',
       route: {
-        routePoints: [{addressName: 'Владимирская улица', houseNumber: '78'}, {
-          addressName: 'Окты улица',
-          houseNumber: '33'
-        }]
+        routePoints: [
+          {addressName: 'Sikorskoho street', houseNumber: '78'},
+          {addressName: 'Vladislava Zaremby lane', houseNumber: '33'}]
       }
     }],
     response: {
@@ -164,11 +174,11 @@ const REQUESTS = {
         ExtraCost: '0',
         comment: '',
         entrance: '1',
-        'route.routePoints[0].addressName': 'Владимирская улица',
+        'route.routePoints[0].addressName': 'Sikorskoho street',
         'route.routePoints[0].houseNumber': '78',
-        'route.routePoints[1].addressName': 'Окты улица',
+        'route.routePoints[1].addressName': 'Vladislava Zaremby lane',
         'route.routePoints[1].houseNumber': '33',
-        Phone: '33555'
+        Phone: phone
       }
     }
   },
@@ -226,8 +236,8 @@ const REQUESTS = {
     compare: {
       url: `${URLS.orders}/order-uid/recreate`,
       method: 'POST',
-      headers: {...DEFAULT_HEADERS},
-      body: {extra_cost: '5'}
+      headers: {...DEFAULT_HEADERS, 'content-type': 'application/json'},
+      body: JSON.stringify({extra_cost: '5'})
     }
   },
 // Destroy Order [PUT]
@@ -238,8 +248,30 @@ const REQUESTS = {
     compare: {
       url: `${URLS.orders}/order-uid/cancel`,
       method: 'PUT',
+      headers: {...DEFAULT_HEADERS, 'content-type': 'application/json'},
+      body: JSON.stringify({cancel_comment: '', client_cancel_reason: 'client'})
+    }
+  },
+  VERIFY_PHONE: {
+    name: 'verifyPhone',
+    args: [],
+    response: {},
+    compare: {
+      url: URLS.verification,
+      method: 'POST',
       headers: {...DEFAULT_HEADERS},
-      body: {cancel_comment: '', client_cancel_reason: 'timeout'}
+      form: {phone}
+    }
+  },
+  CONFIRM_CODE: {
+    name: 'confirmCode',
+    args: ['code'],
+    response: {},
+    compare: {
+      url: URLS.confirmCode,
+      method: 'POST',
+      headers: {...DEFAULT_HEADERS},
+      form: {code: 'code', phone}
     }
   },
 };
